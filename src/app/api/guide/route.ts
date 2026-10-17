@@ -1,4 +1,12 @@
 import { askGemini } from "@/lib/gemini";
+
+function publicError(error: unknown): string {
+  const fallback = "Gemini did not respond. Try again.";
+  if (!(error instanceof Error) || !error.message) return fallback;
+  const key = process.env.GEMINI_API_KEY;
+  if (key && error.message.includes(key)) return fallback;
+  return error.message;
+}
 import { systemPrompt, userPrompt } from "@/lib/prompt";
 import { allowRequest, parseGuideInput } from "@/lib/validate";
 
@@ -42,7 +50,6 @@ export async function POST(request: Request) {
     );
     return Response.json(result);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Gemini did not respond. Try again.";
-    return Response.json({ error: message }, { status: 502 });
+    return Response.json({ error: publicError(error) }, { status: 502 });
   }
 }

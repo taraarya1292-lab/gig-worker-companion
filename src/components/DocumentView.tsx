@@ -41,7 +41,7 @@ export function DocumentView({
   return (
     <div className="grid gap-4">
       <PageHeader
-        badge="bg-[#e8f1ff] text-[#2d6bff]"
+        badge="bg-[#e8f1ff] text-[#1d4ed8]"
         icon={<Icon name="file" />}
         title={t(language, "Document help", "दस्तावेज़ मदद")}
         detail={t(language, "Paste a notice and get it in plain language.", "नोटिस चिपकाएँ और आसान भाषा में समझें।")}
@@ -50,7 +50,7 @@ export function DocumentView({
         <h2 className="text-xl font-semibold text-[#12284d]">
           {t(language, "Explain a notice", "नोटिस समझाओ")}
         </h2>
-        <p className="mt-1 text-base text-[#5d6e80]">
+        <p className="mt-1 text-base text-[#314356]">
           {t(
             language,
             "Paste text only. Do not paste Aadhaar, PAN, or bank numbers.",
@@ -73,14 +73,14 @@ export function DocumentView({
           type="button"
           disabled={text.trim().length < 10 || guide.loading}
           onClick={explain}
-          className="mt-3 min-h-12 w-full rounded-full bg-[#2d6bff] text-lg font-semibold text-white disabled:opacity-50"
+          className="mt-3 min-h-12 w-full rounded-full bg-[#1d4ed8] text-lg font-semibold text-white disabled:opacity-50"
         >
           {t(language, "Explain with Gemini", "Gemini से समझाओ")}
         </button>
       </section>
       <AiPanel language={language} loading={guide.loading} error={guide.error} result={guide.result} />
       {guide.result && (
-        <button type="button" onClick={onUse} className="min-h-12 rounded-full border border-[#2d6bff] bg-white text-lg font-semibold text-[#12284d]">
+        <button type="button" onClick={onUse} className="min-h-12 rounded-full border border-[#1d4ed8] bg-white text-lg font-semibold text-[#12284d]">
           {t(language, "Use this note in a problem", "इस नोट को समस्या में लगाएँ")}
         </button>
       )}

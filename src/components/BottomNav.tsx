@@ -34,7 +34,7 @@ export function BottomNav({
             type="button"
             onClick={item.onClick}
             aria-current={item.active ? "page" : undefined}
-            className={`flex min-h-16 flex-col items-center justify-center gap-1 rounded-2xl text-xs font-semibold ${item.active ? "text-[#1f9a57]" : "text-[#7b8794]"}`}
+            className={`flex min-h-16 flex-col items-center justify-center gap-1 rounded-2xl text-xs font-semibold ${item.active ? "text-[#0e6b3c]" : "text-[#314356]"}`}
           >
             <span className={`flex h-8 w-12 items-center justify-center rounded-2xl ${item.active ? "bg-[#e7f8ee]" : ""}`}>
               {item.icon}

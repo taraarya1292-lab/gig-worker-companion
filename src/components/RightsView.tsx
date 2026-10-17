@@ -24,7 +24,7 @@ export function RightsView({ profile }: { profile: Profile }) {
         <h2 className="text-xl font-semibold text-[#12284d]">
           {t(language, "Scheme facts", "योजनाओं की जानकारी")}
         </h2>
-        <p className="mt-1 text-base text-[#5d6e80]">
+        <p className="mt-1 text-base text-[#314356]">
           {t(
             language,
             "These notes are saved in the app. Gemini uses only this list.",
@@ -37,10 +37,10 @@ export function RightsView({ profile }: { profile: Profile }) {
               <h3 className="text-lg font-semibold">{scheme.name}</h3>
               <p className="text-base">{scheme.what}</p>
               <p className="mt-1 text-base">{scheme.papers}</p>
-              <p className="mt-1 text-base text-[#5d6e80]">
+              <p className="mt-1 text-base text-[#314356]">
                 {t(language, "Check: ", "जाँचें: ")}
                 {scheme.url ? (
-                  <a className="font-semibold text-[#2d6bff] underline" href={scheme.url} target="_blank" rel="noopener noreferrer">{scheme.url}</a>
+                  <a className="font-semibold text-[#1d4ed8] underline" href={scheme.url} target="_blank" rel="noopener noreferrer">{scheme.url}<span className="sr-only">{t(language, ", opens in a new tab", ", नई टैब में खुलेगा")}</span></a>
                 ) : (
                   scheme.check
                 )}

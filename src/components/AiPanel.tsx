@@ -57,7 +57,7 @@ export function AiPanel({
           {result.nextStep}
         </p>
       )}
-      <p className="mt-3 text-base text-[#66716c]">
+      <p className="mt-3 text-base text-[#314356]">
         {t(
           language,
           "Guidance in simple language, not legal advice.",

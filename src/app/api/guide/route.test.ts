@@ -95,6 +95,27 @@ describe("POST /api/guide", () => {
     expect(body.letter).toContain("₹500");
   });
 
+  it("rejects a request that is not JSON", async () => {
+    const response = await POST(new Request("http://localhost/api/guide", {
+      method: "POST",
+      headers: { "content-type": "text/plain", "x-forwarded-for": "not-json" },
+      body: "hello",
+    }));
+    expect(response.status).toBe(415);
+  });
+
+  it("rejects a request that is too large before calling Gemini", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const response = await POST(new Request("http://localhost/api/guide", {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-forwarded-for": "too-large" },
+      body: `{"task":"resolve","note":"${"a".repeat(20_000)}"}`,
+    }));
+    expect(response.status).toBe(413);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("returns 429 after the per-address limit", async () => {
     const ip = `limit-${Date.now()}`;
     for (let count = 0; count < 20; count += 1) {

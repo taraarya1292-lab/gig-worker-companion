@@ -15,12 +15,14 @@ export function HomeView({
   onOpen,
   onAsk,
   onLanguage,
+  onDemo,
 }: {
   profile: Profile;
   serviceFocus: number;
   onOpen: (view: ViewName) => void;
   onAsk: (problem: string) => void;
   onLanguage: (language: Language) => void;
+  onDemo: () => void;
 }) {
   const language = profile.language;
   const [problem, setProblem] = useState("");
@@ -45,7 +47,7 @@ export function HomeView({
         "My payment looks lower than I expected. Please explain the change from my saved earnings.",
         "मेरी कमाई उम्मीद से कम लग रही है। सेव की हुई कमाई से बदलाव समझाइए।",
       ),
-      tone: "bg-[#eef6ff] text-[#2458b5]",
+      tone: "bg-[#eef6ff] text-[#1d4ed8]",
     },
     {
       icon: "file" as const,
@@ -55,7 +57,7 @@ export function HomeView({
         "I want to write a complaint about a problem at work.",
         "मैं काम की समस्या की शिकायत लिखना चाहता हूँ।",
       ),
-      tone: "bg-[#eefaf2] text-[#1d8a49]",
+      tone: "bg-[#eefaf2] text-[#0e6b3c]",
     },
   ];
 
@@ -73,7 +75,7 @@ export function HomeView({
       title: t(language, "Earnings Guide", "कमाई गाइड"),
       detail: t(language, "Understand payments, deductions and hourly pay.", "कमाई, कटौती और घंटे की कमाई समझें।"),
       card: "bg-[#e7f7ee]",
-      badge: "bg-white text-[#1f9a57]",
+      badge: "bg-white text-[#0e6b3c]",
     },
     {
       view: "grievance",
@@ -81,7 +83,7 @@ export function HomeView({
       title: t(language, "Report a Problem", "समस्या बताएँ"),
       detail: t(language, "Get help with payments, deductions and work issues.", "कमाई, कटौती और काम की समस्या में मदद।"),
       card: "bg-[#e8f1ff]",
-      badge: "bg-white text-[#2d6bff]",
+      badge: "bg-white text-[#1d4ed8]",
     },
     {
       view: "rights",
@@ -110,7 +112,7 @@ export function HomeView({
             <p className="text-xl font-semibold leading-none text-[#16315c]">
               Sathi <span className="text-[#2f9e57]">AI</span>
             </p>
-            <p className="mt-1 text-[11px] leading-tight text-[#607086]">Your Work. Your Rights. Your Support.</p>
+            <p className="mt-1 text-sm leading-tight text-[#314356]">{t(language, "Your Work. Your Rights. Your Support.", "आपका काम। आपके अधिकार। आपकी सहायता।")}</p>
           </div>
         </div>
         <label className="inline-flex h-10 items-center gap-1 rounded-full border border-[#d7efe4] bg-white px-3 text-sm font-semibold text-[#1d6b4f]">
@@ -133,7 +135,7 @@ export function HomeView({
           {language === "hi" ? (
             <>
               आज हम आपकी कैसे{" "}
-              <span className="relative inline-block text-[#2d6bff]">
+              <span className="relative inline-block text-[#1d4ed8]">
                 मदद
                 <span className="absolute -bottom-1 left-0 h-1 w-full rounded-full bg-[#f0a04b]" />
               </span>
@@ -142,14 +144,14 @@ export function HomeView({
           ) : (
             <>
               How can we help you{" "}
-              <span className="relative inline-block text-[#2d6bff]">
+              <span className="relative inline-block text-[#1d4ed8]">
                 today
                 <span className="absolute -bottom-1 left-0 h-1 w-full rounded-full bg-[#f0a04b]" />
               </span>?
             </>
           )}
         </h1>
-        <p className="mt-3 max-w-[16rem] text-base leading-6 text-[#5d6e80]">
+        <p className="mt-3 max-w-[16rem] text-base leading-6 text-[#314356]">
           {t(language, "Get guidance, understand your rights, and find the right support.", "मदद लें, अपने अधिकार समझें, और सही सहायता खोजें।")}
         </p>
         <div className="pointer-events-none absolute -right-2 top-0">
@@ -159,7 +161,7 @@ export function HomeView({
 
       <section className="rounded-[28px] border border-[#e3f3ea] bg-gradient-to-b from-white to-[#eef8f3] p-4 shadow-[0_12px_30px_rgba(40,110,80,0.06)]">
         <h2 className="text-2xl font-semibold text-[#16315c]">{t(language, "Ask Sathi AI", "साथी AI से पूछें")}</h2>
-        <p className="text-base text-[#6a7c8c]">{t(language, "Your personal work-support assistant", "आपका काम-सहायता सहायक")}</p>
+        <p className="text-base text-[#314356]">{t(language, "Your personal work-support assistant", "आपका काम-सहायता सहायक")}</p>
         <form
           className="mt-3 flex items-center gap-1 rounded-full border border-[#d9e4ec] bg-white px-3"
           onSubmit={(event) => {
@@ -176,18 +178,18 @@ export function HomeView({
             className="min-h-12 min-w-0 flex-1 bg-transparent text-base outline-none"
           />
           <SpeakButton compact language={language} onText={(spoken) => setProblem((current) => `${current} ${spoken}`.trim())} />
-          <button type="submit" aria-label={t(language, "Send to Sathi AI", "साथी AI को भेजें")} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#21a35a] text-white">
+          <button type="submit" aria-label={t(language, "Send to Sathi AI", "साथी AI को भेजें")} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#0e6b3c] text-white">
             <ArrowUp />
           </button>
         </form>
         <div className="pill-row mt-3">
           {chips.map((chip) => (
-            <button key={chip.label} type="button" onClick={() => ask(chip.text)} className={`inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold ${chip.tone}`}>
+            <button key={chip.label} type="button" onClick={() => ask(chip.text)} className={`inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold ${chip.tone}`}>
               <Icon name={chip.icon} className="h-4 w-4" />
               {chip.label}
             </button>
           ))}
-          <button type="button" onClick={() => onOpen("rights")} className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#f4efff] px-3 py-2 text-sm font-semibold text-[#7a4de0]">
+          <button type="button" onClick={() => onOpen("rights")} className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full bg-[#f4efff] px-3 py-2 text-sm font-semibold text-[#5b2db3]">
             <Icon name="shield" className="h-4 w-4" />
             {t(language, "Check my benefits", "मेरे लाभ देखें")}
           </button>
@@ -196,7 +198,7 @@ export function HomeView({
 
       <section id="services" className="scroll-mt-4">
         <h2 className="text-2xl font-semibold text-[#12284d]">{t(language, "Explore Services", "सेवाएँ देखें")}</h2>
-        <p className="text-base text-[#66788a]">{t(language, "Choose a topic or ask Sathi AI directly.", "कोई विषय चुनें या सीधे साथी AI से पूछें।")}</p>
+        <p className="text-base text-[#314356]">{t(language, "Choose a topic or ask Sathi AI directly.", "कोई विषय चुनें या सीधे साथी AI से पूछें।")}</p>
         <div className="mt-3 grid grid-cols-2 gap-3">
           {services.map((service) => (
             <button key={service.view} type="button" onClick={() => onOpen(service.view)} className={`min-h-36 rounded-3xl p-4 text-left ${service.card}`}>
@@ -207,19 +209,25 @@ export function HomeView({
                 <Chevron />
               </span>
               <span className="mt-3 block text-base font-semibold leading-5 text-[#16315c]">{service.title}</span>
-              <span className="mt-1 block text-sm leading-5 text-[#5d6e80]">{service.detail}</span>
+              <span className="mt-1 block text-sm leading-5 text-[#314356]">{service.detail}</span>
             </button>
           ))}
         </div>
       </section>
 
+      <button type="button" onClick={onDemo} className="rounded-3xl border border-[#f3d7b0] bg-[#fff8ef] px-4 py-4 text-left">
+        <span className="text-sm font-semibold uppercase tracking-wide text-[#6d3f12]">{t(language, "Sample story", "नमूना कहानी")}</span>
+        <span className="mt-1 block font-semibold text-[#16315c]">{t(language, "See a ₹500 deduction drop hourly pay", "₹500 कटौती से घंटे की कमाई गिरी हुई देखें")}</span>
+        <span className="mt-1 block text-sm text-[#7a6248]">{t(language, "Replaces pay entries on this phone. Not your real income.", "इस फोन की कमाई एंट्री बदल देता है। असली आय नहीं।")}</span>
+      </button>
+
       <button type="button" onClick={() => document.getElementById("ask-problem")?.focus()} className="flex items-center gap-3 rounded-3xl bg-[#eef6ff] px-4 py-4 text-left">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-[#2d6bff]">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-[#1d4ed8]">
           <Icon name="path" />
         </span>
         <span>
           <span className="block font-semibold text-[#16315c]">{t(language, "Not sure where to start?", "कहाँ से शुरू करें?")}</span>
-          <span className="block text-sm text-[#5d6e80]">{t(language, "Tell Sathi AI what happened. It will guide you step by step.", "साथी AI को बताएँ क्या हुआ। यह कदम दर कदम आगे बढ़ाएगा।")}</span>
+          <span className="block text-sm text-[#314356]">{t(language, "Tell Sathi AI what happened. It will guide you step by step.", "साथी AI को बताएँ क्या हुआ। यह कदम दर कदम आगे बढ़ाएगा।")}</span>
         </span>
         <Chevron />
       </button>

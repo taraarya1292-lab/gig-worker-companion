@@ -97,7 +97,7 @@ export function App() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-    <main className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4">
+    <main className="flex min-h-0 flex-1 flex-col gap-4 overflow-x-hidden overflow-y-auto px-4 py-4">
       {view !== "home" && (
         <button type="button" onClick={goBack} className="sticky top-0 z-10 -mt-1 inline-flex h-11 items-center gap-1 self-start rounded-full bg-[#f7fbf8]/90 pr-3 text-base font-semibold text-[#16315c]">
           <BackIcon />
@@ -114,6 +114,7 @@ export function App() {
             openView("grievance");
           }}
           onLanguage={(language) => data.setProfile({ ...profile, language })}
+          onDemo={openDemo}
         />
       )}
       {view === "earnings" && (
@@ -153,7 +154,7 @@ export function App() {
           onClearDraft={() => data.setDraft("")}
         />
       )}
-      <p className="text-sm text-[#66788a]">
+      <p className="text-sm text-[#314356]">
         {t(
           profile.language,
           "Guidance in simple language, not legal advice. Earnings and cases stay on this phone.",

@@ -10,7 +10,7 @@ export function Onboarding({ onSave, onDemo }: { onSave: (profile: Profile) => v
   const [state, setState] = useState<StateName>("Maharashtra");
 
   return (
-    <main className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-4 py-6">
+    <main className="flex min-h-0 flex-1 flex-col gap-5 overflow-x-hidden overflow-y-auto px-4 py-6">
       <header>
         <img
           src="/sathi-logo.png"

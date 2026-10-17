@@ -10,6 +10,31 @@ export function recordLines(entries: Earning[]): string[] {
   });
 }
 
+export type PayChange = {
+  beforeDate: string;
+  beforeHourly: number;
+  afterDate: string;
+  afterHourly: number;
+  deduction: number;
+};
+
+export function payChange(entries: Earning[]): PayChange | null {
+  const sorted = [...entries].sort((a, b) => b.date.localeCompare(a.date));
+  const after = sorted.find((entry) => entry.deduction > 0 && hourlyOf(entry) != null);
+  const afterHourly = after ? hourlyOf(after) : null;
+  if (!after || afterHourly == null) return null;
+  const before = sorted.find((entry) => entry.date < after.date && entry.deduction === 0 && hourlyOf(entry) != null);
+  const beforeHourly = before ? hourlyOf(before) : null;
+  if (!before || beforeHourly == null || beforeHourly <= afterHourly) return null;
+  return {
+    beforeDate: before.date,
+    beforeHourly,
+    afterDate: after.date,
+    afterHourly,
+    deduction: after.deduction,
+  };
+}
+
 export function localFacts(entries: Earning[]): string[] {
   if (entries.length === 0) return ["No earnings were shared for this problem."];
   const totals = totalsOf(entries);

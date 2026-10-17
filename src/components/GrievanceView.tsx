@@ -9,6 +9,7 @@ import { t } from "@/lib/text";
 import type { CaseStatus, Earning, Profile, SavedDocument, WorkCase } from "@/lib/types";
 import { useGuide } from "@/lib/useGuide";
 import { Icon } from "@/components/Icon";
+import { PayChange } from "@/components/PayChange";
 import { SpeakButton } from "@/components/SpeakButton";
 
 export function GrievanceView({
@@ -83,6 +84,9 @@ export function GrievanceView({
     }
     setCheckedEvidence([]);
     onClearDraft();
+    requestAnimationFrame(() => {
+      document.getElementById("resolution-result")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   }
 
   function saveCase() {
@@ -110,7 +114,7 @@ export function GrievanceView({
   return (
     <div className="grid gap-4">
       <section className="rounded-[28px] border border-[#d9e6f8] bg-gradient-to-b from-white to-[#eef4ff] p-5 shadow-[0_12px_30px_rgba(22,49,92,0.05)]">
-        <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-[#2d6bff]">
+        <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-[#1d4ed8]">
           <Icon name="path" />
           {t(language, "Problem to resolution", "समस्या से समाधान")}
         </p>
@@ -121,14 +125,14 @@ export function GrievanceView({
       </section>
 
       {cases.length > 0 && (
-        <section className="rounded-2xl border border-[#e8e2d6] bg-white p-4">
+        <section className="rounded-[28px] border border-[#e3f3ea] bg-white p-4">
           <h2 className="text-xl font-semibold">{t(language, "Saved cases", "सेव किए केस")}</h2>
           <ul className="mt-2 grid gap-2">
             {cases.map((item) => (
               <li key={item.id}>
-                <button type="button" onClick={() => setActive(item)} className="min-h-12 w-full rounded-xl bg-[#f3efe6] px-3 text-left text-base">
+                <button type="button" onClick={() => setActive(item)} className="min-h-12 w-full rounded-2xl bg-[#f4faf6] px-3 text-left text-base">
                   <span className="font-semibold">{item.problem.slice(0, 80)}</span>
-                  <span className="mt-1 block text-sm text-[#66716c]">{item.status} · {t(language, "Follow up", "फॉलो अप")} {item.followUp}</span>
+                  <span className="mt-1 block text-sm text-[#314356]">{item.status} · {t(language, "Follow up", "फॉलो अप")} {item.followUp}</span>
                 </button>
               </li>
             ))}
@@ -147,30 +151,32 @@ export function GrievanceView({
         />
       )}
 
-      <section className="rounded-2xl border border-[#e8e2d6] bg-white p-4">
+      <PayChange entries={shared} language={language} />
+
+      <section className="rounded-[28px] border border-[#e3f3ea] bg-white p-4 shadow-[0_12px_30px_rgba(22,49,92,0.05)]">
         <label className="block text-base font-semibold" htmlFor="problem">
           {t(language, "What went wrong?", "क्या गलत हुआ?")}
-          <textarea id="problem" value={problem} maxLength={1000} rows={5} onChange={(event) => setProblem(event.target.value)} className="mt-1 w-full rounded-xl border border-[#ddd6c8] px-3 py-2 text-lg" />
+          <textarea id="problem" value={problem} maxLength={1000} rows={5} onChange={(event) => setProblem(event.target.value)} className="mt-1 w-full rounded-2xl border border-[#d9e4ec] px-3 py-2 text-lg" />
         </label>
         <SpeakButton language={language} onText={(spoken) => setProblem((current) => `${current} ${spoken}`.trim())} />
         {needsAmount && (
           <label className="mt-3 block text-base font-semibold" htmlFor="missing-amount">
             {t(language, "How many rupees were taken or missing?", "कितने रुपये कटे या कम मिले?")}
-            <input id="missing-amount" inputMode="numeric" value={askedAmount} onChange={(event) => setAskedAmount(event.target.value)} className="mt-1 min-h-12 w-full rounded-xl border border-[#ddd6c8] px-3 text-lg" />
+            <input id="missing-amount" inputMode="numeric" value={askedAmount} onChange={(event) => setAskedAmount(event.target.value)} className="mt-1 min-h-12 w-full rounded-2xl border border-[#d9e4ec] px-3 text-lg" />
           </label>
         )}
         <label className="mt-3 flex min-h-12 items-center gap-3 text-base">
           <input type="checkbox" className="h-6 w-6" checked={useRecords} onChange={(event) => setUseRecords(event.target.checked)} />
           {t(language, "Use my saved earnings from the last 7 days", "पिछले 7 दिन की सेव कमाई इस्तेमाल करें")} ({recent.length})
         </label>
-        <button type="button" disabled={problem.trim().length < 10 || needsAmount || guide.loading} onClick={resolve} className="mt-3 min-h-12 w-full rounded-xl bg-[#3d5c52] text-lg font-semibold text-white disabled:opacity-50">
+        <button type="button" disabled={problem.trim().length < 10 || needsAmount || guide.loading} aria-busy={guide.loading} onClick={resolve} className="mt-3 min-h-12 w-full rounded-full bg-[#0e6b3c] text-lg font-semibold text-white disabled:opacity-50">
           {guide.loading ? t(language, "Asking Gemini…", "Gemini से पूछ रहे हैं…") : t(language, "Build a resolution", "समाधान तैयार करें")}
         </button>
         {guide.error && <p role="alert" className="mt-3 rounded-xl bg-[#fdeeee] px-3 py-2 text-base text-[#9a4a4a]">{guide.error}</p>}
       </section>
 
       {letter && (
-        <section className="grid gap-3 rounded-2xl border border-[#d5eadf] bg-[#f4faf6] p-4" aria-live="polite">
+        <section id="resolution-result" className="grid gap-3 rounded-[28px] border border-[#d5eadf] bg-[#f4faf6] p-4" aria-live="polite">
           <p className="text-sm font-semibold uppercase tracking-wide text-[#3d7a64]">
             {letterSource === "gemini"
               ? t(language, "Gemini draft — edit before you use it", "Gemini का मसौदा — इस्तेमाल से पहले बदलें")
@@ -195,7 +201,7 @@ export function GrievanceView({
           )}
           <label className="text-base font-semibold" htmlFor="letter">
             {t(language, "Complaint you can edit", "शिकायत जिसे आप बदल सकते हैं")}
-            <textarea id="letter" value={letter} rows={8} onChange={(event) => setLetter(event.target.value)} className="mt-1 w-full rounded-xl border border-[#ddd6c8] bg-white px-3 py-2 text-lg" />
+            <textarea id="letter" value={letter} rows={8} onChange={(event) => setLetter(event.target.value)} className="mt-1 w-full rounded-2xl border border-[#d9e4ec] bg-white px-3 py-2 text-lg" />
           </label>
           <h2 className="text-xl font-semibold">{t(language, "Evidence to gather", "जुटाने वाले सबूत")}</h2>
           <ul className="grid gap-2">
@@ -214,27 +220,27 @@ export function GrievanceView({
               <li key={channel.id} className="rounded-xl bg-white p-3 text-base">
                 <p className="font-semibold">{channelLabel(channel, language)}</p>
                 <p>{channelDetail(channel, language)}</p>
-                {channel.url && <a className="mt-1 inline-block font-semibold text-[#3d7a64] underline" href={channel.url} target="_blank" rel="noopener noreferrer">{channel.url}</a>}
+                {channel.url && <a className="mt-1 inline-block font-semibold text-[#0e6b3c] underline" href={channel.url} target="_blank" rel="noopener noreferrer">{channel.url}<span className="sr-only">{t(language, ", opens in a new tab", ", नई टैब में खुलेगा")}</span></a>}
               </li>
             ))}
           </ul>
           <h2 className="text-xl font-semibold">{t(language, "Schemes worth checking", "जाँचने लायक योजनाएँ")}</h2>
-          <p className="text-base text-[#66716c]">{t(language, "These are not a decision that you qualify. No verification date is stored here.", "इसका मतलब यह नहीं कि आप योग्य हैं। यहाँ कोई जाँच की तारीख सेव नहीं है।")}</p>
+          <p className="text-base text-[#314356]">{t(language, "These are not a decision that you qualify. No verification date is stored here.", "इसका मतलब यह नहीं कि आप योग्य हैं। यहाँ कोई जाँच की तारीख सेव नहीं है।")}</p>
           <ul className="grid gap-2">
             {schemes.map((scheme) => (
               <li key={scheme.id} className="rounded-xl bg-white p-3 text-base">
                 <p className="font-semibold">{scheme.name}</p>
                 <p>{scheme.what}</p>
                 <p className="mt-1">{scheme.papers}</p>
-                {scheme.url && <a className="mt-1 inline-block font-semibold text-[#3d7a64] underline" href={scheme.url} target="_blank" rel="noopener noreferrer">{scheme.url}</a>}
+                {scheme.url && <a className="mt-1 inline-block font-semibold text-[#0e6b3c] underline" href={scheme.url} target="_blank" rel="noopener noreferrer">{scheme.url}<span className="sr-only">{t(language, ", opens in a new tab", ", नई टैब में खुलेगा")}</span></a>}
               </li>
             ))}
           </ul>
-          <button type="button" onClick={saveCase} className="min-h-12 rounded-xl bg-[#3d7a64] text-lg font-semibold text-white">
+          <button type="button" onClick={saveCase} className="min-h-12 rounded-full bg-[#1d6b4f] text-lg font-semibold text-white">
             {t(language, "Save case on this phone", "केस इस फोन पर सेव करें")}
           </button>
           {savedNote && <p role="status">{savedNote}</p>}
-          <p className="text-sm text-[#66716c]">{t(language, "Guidance, not legal advice. Sathi AI does not submit this complaint.", "यह मदद है, कानूनी सलाह नहीं। साथी AI यह शिकायत जमा नहीं करता।")}</p>
+          <p className="text-sm text-[#314356]">{t(language, "Guidance, not legal advice. Sathi AI does not submit this complaint.", "यह मदद है, कानूनी सलाह नहीं। साथी AI यह शिकायत जमा नहीं करता।")}</p>
         </section>
       )}
     </div>
@@ -251,12 +257,12 @@ function CaseEditor({
   onChange: (next: WorkCase) => void;
 }) {
   return (
-    <section className="grid gap-3 rounded-2xl border border-[#e8e2d6] bg-white p-4">
+    <section className="grid gap-3 rounded-[28px] border border-[#e3f3ea] bg-white p-4">
       <h2 className="text-xl font-semibold">{t(language, "Open case", "खुला केस")}</h2>
-      {workCase.sample && <p className="text-base text-[#66716c]">{t(language, "This case uses the sample pay story.", "इस केस में नमूना कमाई की कहानी है।")}</p>}
+      {workCase.sample && <p className="text-base text-[#314356]">{t(language, "This case uses the sample pay story.", "इस केस में नमूना कमाई की कहानी है।")}</p>}
       <label className="text-base font-semibold" htmlFor="case-status">
         {t(language, "Status", "स्थिति")}
-        <select id="case-status" value={workCase.status} onChange={(event) => onChange({ ...workCase, status: event.target.value as CaseStatus })} className="mt-1 min-h-12 w-full rounded-xl border border-[#ddd6c8] px-3 text-lg">
+        <select id="case-status" value={workCase.status} onChange={(event) => onChange({ ...workCase, status: event.target.value as CaseStatus })} className="mt-1 min-h-12 w-full rounded-2xl border border-[#d9e4ec] px-3 text-lg">
           <option value="open">{t(language, "Open", "खुला")}</option>
           <option value="waiting">{t(language, "Waiting for a reply", "जवाब का इंतज़ार")}</option>
           <option value="done">{t(language, "Done", "पूरा")}</option>
@@ -264,14 +270,14 @@ function CaseEditor({
       </label>
       <label className="text-base font-semibold" htmlFor="case-follow">
         {t(language, "Follow up on", "फॉलो अप की तारीख")}
-        <input id="case-follow" type="date" value={workCase.followUp} onChange={(event) => onChange({ ...workCase, followUp: event.target.value })} className="mt-1 min-h-12 w-full rounded-xl border border-[#ddd6c8] px-3 text-lg" />
+        <input id="case-follow" type="date" value={workCase.followUp} onChange={(event) => onChange({ ...workCase, followUp: event.target.value })} className="mt-1 min-h-12 w-full rounded-2xl border border-[#d9e4ec] px-3 text-lg" />
       </label>
       <label className="text-base font-semibold" htmlFor="case-notes">
         {t(language, "Notes", "नोट")}
-        <textarea id="case-notes" value={workCase.notes} rows={3} onChange={(event) => onChange({ ...workCase, notes: event.target.value })} className="mt-1 w-full rounded-xl border border-[#ddd6c8] px-3 py-2 text-lg" />
+        <textarea id="case-notes" value={workCase.notes} rows={3} onChange={(event) => onChange({ ...workCase, notes: event.target.value })} className="mt-1 w-full rounded-2xl border border-[#d9e4ec] px-3 py-2 text-lg" />
       </label>
       <p className="whitespace-pre-wrap text-base">{workCase.letter}</p>
-      <p className="text-sm text-[#66716c]">{t(language, "Saved only on this phone. It has not been submitted.", "सिर्फ इस फोन पर सेव है। इसे जमा नहीं किया गया।")}</p>
+      <p className="text-sm text-[#314356]">{t(language, "Saved only on this phone. It has not been submitted.", "सिर्फ इस फोन पर सेव है। इसे जमा नहीं किया गया।")}</p>
     </section>
   );
 }

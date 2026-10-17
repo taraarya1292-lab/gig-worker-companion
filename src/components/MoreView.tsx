@@ -34,8 +34,8 @@ export function MoreView({
     <div className="grid gap-4">
       <h1 className="text-3xl font-semibold text-[#12284d]">{t(language, "More", "और")}</h1>
       <section className="rounded-[28px] border border-[#e3f3ea] bg-white p-5 shadow-[0_12px_30px_rgba(22,49,92,0.05)]">
-        <p className="text-base text-[#66788a]">{roleLabel(profile.role, language)} · {profile.state}</p>
-        <p className="mt-3 text-sm font-semibold uppercase tracking-wide text-[#1f9a57]">{t(language, "Today's net", "आज की शुद्ध कमाई")}</p>
+        <p className="text-base text-[#314356]">{roleLabel(profile.role, language)} · {profile.state}</p>
+        <p className="mt-3 text-sm font-semibold uppercase tracking-wide text-[#0e6b3c]">{t(language, "Today's net", "आज की शुद्ध कमाई")}</p>
         <p className="text-4xl font-semibold text-[#12284d]">{rupees(todayTotals.net)}</p>
         <p className="mt-2 text-base text-[#4d5d6c]">
           {t(language, "Last 7 days", "पिछले 7 दिन")} {rupees(weekTotals.net)}
@@ -56,7 +56,7 @@ export function MoreView({
       <button type="button" onClick={onDemo} className="min-h-14 rounded-2xl border border-[#d5e4dc] bg-white px-4 text-left text-lg font-semibold">
         {t(language, "Load the sample ₹500 deduction story", "₹500 कटौती की नमूना कहानी खोलें")}
       </button>
-      <p className="text-sm text-[#66788a]">
+      <p className="text-sm text-[#314356]">
         {t(language, "The sample replaces pay entries on this phone. It is not your real income.", "नमूना इस फोन की कमाई एंट्री बदल देता है। यह आपकी असली आय नहीं है।")}
       </p>
       <button type="button" onClick={onChangeProfile} className="min-h-12 rounded-xl border border-[#d5e4dc] bg-white text-lg font-semibold">

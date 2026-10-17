@@ -5,12 +5,14 @@ import "./globals.css";
 const sans = Noto_Sans({
   subsets: ["latin"],
   weight: ["400", "600"],
+  display: "swap",
   variable: "--font-sans",
 });
 
 const devanagari = Noto_Sans_Devanagari({
   subsets: ["devanagari"],
   weight: ["400", "600"],
+  display: "swap",
   variable: "--font-devanagari",
 });
 

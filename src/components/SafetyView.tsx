@@ -46,7 +46,7 @@ export function SafetyView({
       />
       <section className="rounded-[28px] border border-[#ffe8cc] bg-white p-4 shadow-[0_12px_30px_rgba(22,49,92,0.05)]">
         <h2 className="text-xl font-semibold text-[#12284d]">{t(language, "Today's safety check", "आज की सुरक्षा जाँच")}</h2>
-        <p className="mt-1 text-base text-[#5d6e80]">{todayISO()}</p>
+        <p className="mt-1 text-base text-[#314356]">{todayISO()}</p>
         <ul className="mt-3 grid gap-2">
           {items.map((item) => (
             <li key={item.id}>
@@ -77,7 +77,7 @@ export function SafetyView({
           {t(language, "Save this incident note", "इस घटना का नोट सेव करें")}
         </button>
       )}
-      <p className="text-base text-[#5d6e80]">
+      <p className="text-base text-[#314356]">
         {t(language, "Saving a note does not contact police or an ambulance.", "नोट सेव करने से पुलिस या एम्बुलेंस को सूचना नहीं जाती।")}
       </p>
     </div>

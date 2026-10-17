@@ -4,7 +4,7 @@ import { demoEarnings, demoProblem } from "./demo";
 import { parseGuideResult } from "./gemini";
 import { hourlyFromTotals, hourlyOf, netOf, totalsOf } from "./money";
 import { systemPrompt, userPrompt } from "./prompt";
-import { localFacts, localLetter, readRupeeAmount, schemeIdsFor } from "./resolution";
+import { localFacts, localLetter, payChange, readRupeeAmount, schemeIdsFor } from "./resolution";
 import { SCHEMES } from "./schemes";
 import { maskSensitive } from "./mask";
 import { allowRequest, parseGuideInput } from "./validate";
@@ -103,6 +103,43 @@ describe("resolution draft", () => {
     expect(readRupeeAmount(demoProblem("en"))).toBe(500);
     expect(readRupeeAmount(demoProblem("hi"))).toBe(500);
     expect(localFacts(entries).some((fact) => fact.includes("₹500"))).toBe(true);
+  });
+
+  it("shows the sample deduction as a real hourly drop", () => {
+    const entries = demoEarnings();
+    const change = payChange(entries);
+    const todayEntry = entries.find((entry) => entry.id === "demo-today");
+    const yesterday = entries.find((entry) => entry.id === "demo-yesterday");
+    expect(change).toEqual({
+      beforeDate: yesterday?.date,
+      beforeHourly: 164,
+      afterDate: todayEntry?.date,
+      afterHourly: 55,
+      deduction: 500,
+    });
+    expect(payChange([])).toBeNull();
+    expect(payChange([{ ...today, deduction: 0 }])).toBeNull();
+    expect(payChange([
+      { ...today, id: "later", date: "2026-10-17", deduction: 100, hours: 6, amount: 900, expense: 0 },
+      { ...today, id: "earlier", date: "2026-10-16", deduction: 0, hours: 6, amount: 200, expense: 0 },
+    ])).toBeNull();
+  });
+
+  it("rejects unknown roles and an earnings request with no pay", () => {
+    expect(parseGuideInput({
+      task: "earnings",
+      language: "en",
+      role: "delivery",
+      state: "Maharashtra",
+      earnings: [],
+    })).toBe("Add an earning first.");
+    expect(parseGuideInput({
+      task: "resolve",
+      language: "en",
+      role: "unknown",
+      state: "Maharashtra",
+      dispute: "The app deducted ₹500 from today's pay.",
+    })).toBe("Choose a role.");
   });
 
   it("keeps scheme links and complaint channels to the known set", () => {
