@@ -1,9 +1,12 @@
-import type { Earning, Profile, SavedDocument } from "./types";
+import { normalizeEarning } from "./money";
+import type { Earning, Profile, SavedDocument, WorkCase } from "./types";
 
 const PROFILE_KEY = "gwc-profile";
 const EARNINGS_KEY = "gwc-earnings";
 const SAFETY_KEY = "gwc-safety-date";
 const DOCUMENT_KEY = "gwc-document";
+const CASES_KEY = "gwc-cases";
+const DRAFT_KEY = "gwc-draft";
 
 function readJson<T>(key: string): T | null {
   try {
@@ -27,7 +30,7 @@ export function saveProfile(profile: Profile) {
 }
 
 export function loadEarnings(): Earning[] {
-  return readJson<Earning[]>(EARNINGS_KEY) ?? [];
+  return (readJson<Earning[]>(EARNINGS_KEY) ?? []).map(normalizeEarning);
 }
 
 export function saveEarnings(earnings: Earning[]) {
@@ -50,6 +53,23 @@ export function saveDocument(document: SavedDocument) {
   writeJson(DOCUMENT_KEY, document);
 }
 
+export function loadCases(): WorkCase[] {
+  return readJson<WorkCase[]>(CASES_KEY) ?? [];
+}
+
+export function saveCases(cases: WorkCase[]) {
+  writeJson(CASES_KEY, cases.slice(0, 20));
+}
+
+export function loadDraft(): string {
+  return localStorage.getItem(DRAFT_KEY) ?? "";
+}
+
+export function saveDraft(problem: string) {
+  if (problem) localStorage.setItem(DRAFT_KEY, problem);
+  else localStorage.removeItem(DRAFT_KEY);
+}
+
 export function clearProfile() {
   localStorage.removeItem(PROFILE_KEY);
 }
@@ -59,6 +79,8 @@ export function clearLocalData() {
   localStorage.removeItem(EARNINGS_KEY);
   localStorage.removeItem(SAFETY_KEY);
   localStorage.removeItem(DOCUMENT_KEY);
+  localStorage.removeItem(CASES_KEY);
+  localStorage.removeItem(DRAFT_KEY);
 }
 
 export function todayISO(): string {
@@ -66,6 +88,10 @@ export function todayISO(): string {
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   return `${date.getFullYear()}-${month}-${day}`;
+}
+
+export function isoPlusDays(days: number): string {
+  return isoDaysAgo(-days);
 }
 
 export function isoDaysAgo(days: number): string {

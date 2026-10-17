@@ -2,17 +2,32 @@
 
 :root {
   --background: #f4f1ea;
-  --foreground: #1c1915;
+  --foreground: #24312c;
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(circle at top, #fbf8f2 0%, #f4f1ea 42%, #efe8dc 100%);
   color: var(--foreground);
-  font-family: "Segoe UI", "Nirmala UI", sans-serif;
+  font-family: var(--font-sans), var(--font-devanagari), "Segoe UI", "Nirmala UI", sans-serif;
   font-size: 18px;
+  line-height: 1.55;
 }
 
 :focus-visible {
-  outline: 3px solid #0f6b4c;
-  outline-offset: 2px;
+  outline: 3px solid #3d7a64;
+  outline-offset: 3px;
+}
+
+h1,
+h2 {
+  letter-spacing: -0.02em;
+}
+
+button,
+a,
+input,
+textarea,
+select {
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
 }

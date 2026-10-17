@@ -1,25 +1,32 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { demoEarnings, demoProblem } from "@/lib/demo";
 import {
   clearLocalData,
   clearProfile,
+  loadCases,
   loadDocument,
+  loadDraft,
   loadEarnings,
   loadProfile,
   loadSafetyDate,
+  saveCases,
   saveDocument,
+  saveDraft,
   saveEarnings,
   saveProfile,
   saveSafetyDate,
 } from "@/lib/storage";
-import type { Earning, Profile, SavedDocument } from "@/lib/types";
+import type { Earning, Language, Profile, SavedDocument, WorkCase } from "@/lib/types";
 
 type Snapshot = {
   profile: Profile | null;
   earnings: Earning[];
   safetyDate: string | null;
   documentNote: SavedDocument | null;
+  cases: WorkCase[];
+  draft: string;
 };
 
 const serverSnapshot: Snapshot = {
@@ -27,6 +34,8 @@ const serverSnapshot: Snapshot = {
   earnings: [],
   safetyDate: null,
   documentNote: null,
+  cases: [],
+  draft: "",
 };
 
 let current: Snapshot = serverSnapshot;
@@ -39,6 +48,8 @@ function readFromBrowser(): Snapshot {
     earnings: loadEarnings(),
     safetyDate: loadSafetyDate(),
     documentNote: loadDocument(),
+    cases: loadCases(),
+    draft: loadDraft(),
   };
 }
 
@@ -78,6 +89,10 @@ export function useCompanion() {
       saveEarnings(earnings);
       publish({ ...current, earnings });
     },
+    replaceEarnings(earnings: Earning[]) {
+      saveEarnings(earnings);
+      publish({ ...current, earnings });
+    },
     markSafety(date: string) {
       saveSafetyDate(date);
       publish({ ...current, safetyDate: date });
@@ -85,6 +100,29 @@ export function useCompanion() {
     setDocument(documentNote: SavedDocument) {
       saveDocument(documentNote);
       publish({ ...current, documentNote });
+    },
+    setDraft(draft: string) {
+      saveDraft(draft);
+      publish({ ...current, draft });
+    },
+    addCase(workCase: WorkCase) {
+      const cases = [workCase, ...current.cases].slice(0, 20);
+      saveCases(cases);
+      publish({ ...current, cases });
+    },
+    updateCase(workCase: WorkCase) {
+      const cases = current.cases.map((item) => (item.id === workCase.id ? workCase : item));
+      saveCases(cases);
+      publish({ ...current, cases });
+    },
+    loadDemo(language: Language) {
+      const profile: Profile = { role: "delivery", state: "Maharashtra", language };
+      const earnings = demoEarnings();
+      const draft = demoProblem(language);
+      saveProfile(profile);
+      saveEarnings(earnings);
+      saveDraft(draft);
+      publish({ ...current, profile, earnings, draft });
     },
     clear() {
       clearLocalData();

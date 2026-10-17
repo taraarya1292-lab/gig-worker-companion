@@ -38,8 +38,27 @@ export type Earning = {
   id: string;
   date: string;
   amount: number;
+  expense: number;
+  deduction: number;
   hours: number;
   note: string;
+};
+
+export type CaseStatus = "open" | "waiting" | "done";
+
+export type WorkCase = {
+  id: string;
+  created: string;
+  followUp: string;
+  status: CaseStatus;
+  problem: string;
+  facts: string[];
+  assumptions: string[];
+  plan: string[];
+  letter: string;
+  evidence: string[];
+  notes: string;
+  sample: boolean;
 };
 
 export type SavedDocument = {
@@ -52,6 +71,13 @@ export type GuideResult = {
   summary: string;
   points: string[];
   nextStep: string;
+  facts: string[];
+  assumptions: string[];
+  plan: string[];
+  letter: string;
+  evidence: string[];
+  channels: string[];
+  missing: string[];
 };
 
 export type GuideTask =
@@ -59,4 +85,5 @@ export type GuideTask =
   | "safety"
   | "rights"
   | "document"
-  | "grievance";
+  | "grievance"
+  | "resolve";

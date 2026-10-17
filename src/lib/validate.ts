@@ -11,7 +11,7 @@ import {
   type StateName,
 } from "./types";
 
-const TASKS: GuideTask[] = ["earnings", "safety", "rights", "document", "grievance"];
+const TASKS: GuideTask[] = ["earnings", "safety", "rights", "document", "grievance", "resolve"];
 
 export type GuideInput = {
   task: GuideTask;
@@ -48,7 +48,9 @@ export function parseGuideInput(body: unknown): GuideInput | string {
   const task = raw.task as GuideTask;
   if (task === "earnings" && earnings.length === 0) return "Add an earning first.";
   if (task === "document" && documentText.length < 10) return "Paste the notice first.";
-  if (task === "grievance" && dispute.length < 10) return "Describe what happened first.";
+  if ((task === "grievance" || task === "resolve") && dispute.length < 10) {
+    return "Describe what happened first.";
+  }
 
   return {
     task,
@@ -80,15 +82,26 @@ function parseEarnings(value: unknown): Earning[] | string {
     if (typeof row.hours !== "number" || !Number.isFinite(row.hours) || row.hours < 0 || row.hours > 24) {
       return "Hours must be from 0 to 24.";
     }
+    const expense = moneyField(row.expense);
+    const deduction = moneyField(row.deduction);
+    if (expense == null || deduction == null) return "An expense or deduction is not valid.";
     earnings.push({
       id: typeof row.id === "string" ? row.id.slice(0, 40) : "",
       date: row.date,
       amount: Math.round(row.amount),
+      expense,
+      deduction,
       hours: Math.round(row.hours * 10) / 10,
       note: maskSensitive(clip(typeof row.note === "string" ? row.note : "", 200)),
     });
   }
   return earnings;
+}
+
+function moneyField(value: unknown): number | null {
+  if (value == null) return 0;
+  if (typeof value !== "number" || !Number.isFinite(value) || value < 0 || value > 100000) return null;
+  return Math.round(value);
 }
 
 function parseGaps(value: unknown, role: Role): string[] | string {
@@ -104,15 +117,24 @@ function parseGaps(value: unknown, role: Role): string[] | string {
 }
 
 const hits = new Map<string, { count: number; reset: number }>();
+const WINDOW_MS = 60_000;
+const MAX_HITS = 20;
+const MAX_KEYS = 500;
 
 export function allowRequest(ip: string): boolean {
   const now = Date.now();
+  if (hits.size > MAX_KEYS) {
+    for (const [key, value] of hits) {
+      if (now > value.reset) hits.delete(key);
+    }
+  }
+
   const current = hits.get(ip);
   if (!current || now > current.reset) {
-    hits.set(ip, { count: 1, reset: now + 60_000 });
+    hits.set(ip, { count: 1, reset: now + WINDOW_MS });
     return true;
   }
-  if (current.count >= 20) return false;
+  if (current.count >= MAX_HITS) return false;
   current.count += 1;
   return true;
 }

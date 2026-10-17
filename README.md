@@ -9,6 +9,7 @@ Gemini runs on the server. Earnings stay in the browser. There is no login.
 1. Add `GEMINI_API_KEY` to `.env.local`.
 2. `npm run dev`
 3. Open http://localhost:3000
+4. `npm test` checks pay math, masking, and the guide route without calling Gemini.
 
 ## Walkthrough
 

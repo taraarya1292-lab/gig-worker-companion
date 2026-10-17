@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon } from "@/components/Icon";
 import { useSyncExternalStore } from "react";
 import { t } from "@/lib/text";
 import type { Language } from "@/lib/types";
@@ -54,8 +55,11 @@ export function SpeakButton({
   }
 
   return (
-    <button type="button" onClick={listen} className="mt-2 min-h-12 w-full rounded-xl border border-[#1c1915] bg-white text-lg font-semibold">
-      {t(language, "Speak instead", "बोलकर लिखें")}
+    <button type="button" onClick={listen} className="mt-2 min-h-12 w-full rounded-xl border border-[#3d5c52] bg-white text-lg font-semibold">
+      <span className="inline-flex items-center justify-center gap-2">
+        <Icon name="mic" />
+        {t(language, "Speak instead", "बोलकर लिखें")}
+      </span>
     </button>
   );
 }

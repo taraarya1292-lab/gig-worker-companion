@@ -1,3 +1,4 @@
+import { Icon } from "@/components/Icon";
 import type { GuideResult, Language } from "@/lib/types";
 import { t } from "@/lib/text";
 
@@ -14,15 +15,18 @@ export function AiPanel({
 }) {
   if (loading) {
     return (
-      <p role="status" className="rounded-2xl bg-[#e7f3ee] px-4 py-3 text-lg">
-        {t(language, "Asking Gemini…", "Gemini से पूछ रहे हैं…")}
+      <p role="status" className="rounded-2xl bg-[#e8f4ee] px-4 py-3 text-lg">
+        <span className="inline-flex items-center gap-2">
+          <Icon name="leaf" />
+          {t(language, "Sathi is asking Gemini…", "साथी Gemini से पूछ रहा है…")}
+        </span>
       </p>
     );
   }
 
   if (error) {
     return (
-      <p role="alert" className="rounded-2xl bg-[#fde8e8] px-4 py-3 text-lg text-[#8f2d2d]">
+      <p role="alert" className="rounded-2xl bg-[#fdeeee] px-4 py-3 text-lg text-[#9a4a4a]">
         {error}
       </p>
     );
@@ -31,9 +35,12 @@ export function AiPanel({
   if (!result) return null;
 
   return (
-    <section aria-live="polite" className="rounded-2xl border border-[#d7e8df] bg-[#f3faf6] p-4">
-      <p className="text-sm font-semibold uppercase tracking-wide text-[#0f6b4c]">
-        {t(language, "Live Gemini answer", "Gemini का जवाब")}
+    <section aria-live="polite" className="rounded-2xl border border-[#d5eadf] bg-[#f4faf6] p-4">
+      <p className="text-sm font-semibold uppercase tracking-wide text-[#3d7a64]">
+        <span className="inline-flex items-center gap-2">
+          <Icon name="leaf" />
+          {t(language, "Live Gemini answer", "Gemini का जवाब")}
+        </span>
       </p>
       <h2 className="mt-1 text-2xl font-semibold">{result.title}</h2>
       <p className="mt-3 whitespace-pre-wrap text-lg leading-8">{result.summary}</p>
@@ -50,7 +57,7 @@ export function AiPanel({
           {result.nextStep}
         </p>
       )}
-      <p className="mt-3 text-base text-[#5c564c]">
+      <p className="mt-3 text-base text-[#66716c]">
         {t(
           language,
           "Guidance in simple language, not legal advice.",

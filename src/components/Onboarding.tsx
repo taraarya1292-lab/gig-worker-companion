@@ -4,7 +4,7 @@ import { useState } from "react";
 import { roleLabel, t } from "@/lib/text";
 import { LANGUAGES, ROLES, STATES, type Language, type Profile, type Role, type StateName } from "@/lib/types";
 
-export function Onboarding({ onSave }: { onSave: (profile: Profile) => void }) {
+export function Onboarding({ onSave, onDemo }: { onSave: (profile: Profile) => void; onDemo: (language: Language) => void }) {
   const [language, setLanguage] = useState<Language>("en");
   const [role, setRole] = useState<Role | null>(null);
   const [state, setState] = useState<StateName>("Maharashtra");
@@ -12,17 +12,21 @@ export function Onboarding({ onSave }: { onSave: (profile: Profile) => void }) {
   return (
     <main className="mx-auto flex min-h-full w-full max-w-lg flex-col gap-5 px-4 py-6">
       <header>
-        <p className="text-sm font-semibold uppercase tracking-wide text-[#0f6b4c]">
-          {t(language, "Warm-up", "वार्म-अप")}
-        </p>
-        <h1 className="mt-1 text-3xl font-semibold leading-tight">
-          {t(language, "Gig Worker Companion", "गिग वर्कर साथी")}
+        <img
+          src="/sathi-logo.png"
+          alt="Sathi AI. Your work. Your rights. Your support."
+          width={826}
+          height={849}
+          className="mx-auto h-auto w-60"
+        />
+        <h1 className="mt-3 text-3xl font-semibold leading-tight">
+          {t(language, "Protect your work. Know your worth.", "अपने काम की रक्षा करें। अपनी कीमत जानें।")}
         </h1>
         <p className="mt-2 text-lg leading-8">
           {t(
             language,
-            "Earnings, safety, rights, documents, and complaints in simple words.",
-            "कमाई, सुरक्षा, अधिकार, दस्तावेज़ और शिकायत — आसान शब्दों में।",
+            "From a missing payment to a letter you can send yourself.",
+            "छूटी हुई कमाई से लेकर एक पत्र तक, जिसे आप खुद भेज सकें।",
           )}
         </p>
       </header>
@@ -71,7 +75,7 @@ export function Onboarding({ onSave }: { onSave: (profile: Profile) => void }) {
           id="state"
           value={state}
           onChange={(event) => setState(event.target.value as StateName)}
-          className="mt-2 min-h-12 w-full rounded-xl border border-[#cfc6b8] bg-white px-3 text-lg"
+          className="mt-2 min-h-12 w-full rounded-xl border border-[#ddd6c8] bg-white px-3 text-lg"
         >
           {STATES.map((item) => (
             <option key={item} value={item}>
@@ -85,9 +89,12 @@ export function Onboarding({ onSave }: { onSave: (profile: Profile) => void }) {
         type="button"
         disabled={!role}
         onClick={() => role && onSave({ role, state, language })}
-        className="min-h-12 rounded-xl bg-[#0f6b4c] px-4 text-lg font-semibold text-white disabled:opacity-50"
+        className="min-h-12 rounded-xl bg-[#3d7a64] px-4 text-lg font-semibold text-white disabled:opacity-50"
       >
         {t(language, "Continue", "आगे बढ़ें")}
+      </button>
+      <button type="button" onClick={() => onDemo(language)} className="min-h-12 rounded-xl border border-[#3d5c52] text-lg font-semibold">
+        {t(language, "Try the sample pay story", "नमूना कमाई की कहानी देखें")}
       </button>
     </main>
   );
@@ -95,6 +102,6 @@ export function Onboarding({ onSave }: { onSave: (profile: Profile) => void }) {
 
 function choiceClass(active: boolean): string {
   return active
-    ? "min-h-12 rounded-xl border-2 border-[#0f6b4c] bg-[#e7f3ee] px-4 text-left text-lg font-semibold"
-    : "min-h-12 rounded-xl border border-[#cfc6b8] bg-white px-4 text-left text-lg";
+    ? "min-h-12 rounded-xl border-2 border-[#3d7a64] bg-[#e8f4ee] px-4 text-left text-lg font-semibold"
+    : "min-h-12 rounded-xl border border-[#ddd6c8] bg-white px-4 text-left text-lg";
 }
