@@ -1,0 +1,74 @@
+"use client";
+
+import { useState } from "react";
+import { AiPanel } from "@/components/AiPanel";
+import { maskSensitive } from "@/lib/mask";
+import { t } from "@/lib/text";
+import type { Profile, SavedDocument } from "@/lib/types";
+import { useGuide } from "@/lib/useGuide";
+import { SpeakButton } from "@/components/SpeakButton";
+
+export function DocumentView({
+  profile,
+  onSave,
+}: {
+  profile: Profile;
+  onSave: (document: SavedDocument) => void;
+}) {
+  const language = profile.language;
+  const [text, setText] = useState("");
+  const guide = useGuide();
+
+  async function explain() {
+    const masked = maskSensitive(text.trim());
+    const result = await guide.ask({
+      task: "document",
+      profile,
+      documentText: masked,
+    });
+    if (result) {
+      onSave({
+        excerpt: masked.slice(0, 280),
+        summary: result.summary,
+      });
+    }
+  }
+
+  return (
+    <div className="grid gap-4">
+      <section className="rounded-2xl border border-[#e4ddd0] bg-white p-4">
+        <h2 className="text-2xl font-semibold">
+          {t(language, "Explain a notice", "नोटिस समझाओ")}
+        </h2>
+        <p className="mt-1 text-base text-[#5c564c]">
+          {t(
+            language,
+            "Paste text only. Do not paste Aadhaar, PAN, or bank numbers.",
+            "सिर्फ लिखी बात चिपकाएँ। आधार, पैन या बैंक नंबर न डालें।",
+          )}
+        </p>
+        <label className="mt-3 block text-base font-semibold" htmlFor="notice">
+          {t(language, "Notice or message", "नोटिस या संदेश")}
+          <textarea
+            id="notice"
+            value={text}
+            maxLength={2000}
+            onChange={(event) => setText(event.target.value)}
+            rows={6}
+            className="mt-1 w-full rounded-xl border border-[#cfc6b8] px-3 py-2 text-lg"
+          />
+        </label>
+        <SpeakButton language={language} onText={(spoken) => setText((current) => `${current} ${spoken}`.trim())} />
+        <button
+          type="button"
+          disabled={text.trim().length < 10 || guide.loading}
+          onClick={explain}
+          className="mt-3 min-h-12 w-full rounded-xl bg-[#1c1915] text-lg font-semibold text-white disabled:opacity-50"
+        >
+          {t(language, "Explain with Gemini", "Gemini से समझाओ")}
+        </button>
+      </section>
+      <AiPanel language={language} loading={guide.loading} error={guide.error} result={guide.result} />
+    </div>
+  );
+}
