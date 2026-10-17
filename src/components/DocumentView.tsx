@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AiPanel } from "@/components/AiPanel";
 import { Icon } from "@/components/Icon";
+import { PageHeader } from "@/components/PageHeader";
 import { maskSensitive } from "@/lib/mask";
 import { t } from "@/lib/text";
 import type { Profile, SavedDocument } from "@/lib/types";
@@ -39,12 +40,17 @@ export function DocumentView({
 
   return (
     <div className="grid gap-4">
-      <section className="rounded-2xl border border-[#e8e2d6] bg-white p-4">
-        <h2 className="flex items-center gap-2 text-2xl font-semibold">
-          <Icon name="file" />
+      <PageHeader
+        badge="bg-[#e8f1ff] text-[#2d6bff]"
+        icon={<Icon name="file" />}
+        title={t(language, "Document help", "दस्तावेज़ मदद")}
+        detail={t(language, "Paste a notice and get it in plain language.", "नोटिस चिपकाएँ और आसान भाषा में समझें।")}
+      />
+      <section className="rounded-[28px] border border-[#d9e6f8] bg-white p-4 shadow-[0_12px_30px_rgba(22,49,92,0.05)]">
+        <h2 className="text-xl font-semibold text-[#12284d]">
           {t(language, "Explain a notice", "नोटिस समझाओ")}
         </h2>
-        <p className="mt-1 text-base text-[#66716c]">
+        <p className="mt-1 text-base text-[#5d6e80]">
           {t(
             language,
             "Paste text only. Do not paste Aadhaar, PAN, or bank numbers.",
@@ -59,7 +65,7 @@ export function DocumentView({
             maxLength={2000}
             onChange={(event) => setText(event.target.value)}
             rows={6}
-            className="mt-1 w-full rounded-xl border border-[#ddd6c8] px-3 py-2 text-lg"
+            className="mt-1 w-full rounded-2xl border border-[#d9e4ec] bg-white px-3 py-2 text-lg"
           />
         </label>
         <SpeakButton language={language} onText={(spoken) => setText((current) => `${current} ${spoken}`.trim())} />
@@ -67,14 +73,14 @@ export function DocumentView({
           type="button"
           disabled={text.trim().length < 10 || guide.loading}
           onClick={explain}
-          className="mt-3 min-h-12 w-full rounded-xl bg-[#3d5c52] text-lg font-semibold text-white disabled:opacity-50"
+          className="mt-3 min-h-12 w-full rounded-full bg-[#2d6bff] text-lg font-semibold text-white disabled:opacity-50"
         >
           {t(language, "Explain with Gemini", "Gemini से समझाओ")}
         </button>
       </section>
       <AiPanel language={language} loading={guide.loading} error={guide.error} result={guide.result} />
       {guide.result && (
-        <button type="button" onClick={onUse} className="min-h-12 rounded-xl border border-[#3d5c52] bg-white text-lg font-semibold">
+        <button type="button" onClick={onUse} className="min-h-12 rounded-full border border-[#2d6bff] bg-white text-lg font-semibold text-[#12284d]">
           {t(language, "Use this note in a problem", "इस नोट को समस्या में लगाएँ")}
         </button>
       )}

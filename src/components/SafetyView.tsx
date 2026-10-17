@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AiPanel } from "@/components/AiPanel";
 import { Icon } from "@/components/Icon";
+import { PageHeader } from "@/components/PageHeader";
 import { checklistFor, labelFor } from "@/lib/checklists";
 import { todayISO } from "@/lib/storage";
 import { t } from "@/lib/text";
@@ -37,9 +38,15 @@ export function SafetyView({
 
   return (
     <div className="grid gap-4">
-      <section className="rounded-2xl border border-[#e8e2d6] bg-white p-4">
-        <h2 className="flex items-center gap-2 text-2xl font-semibold"><Icon name="shield" />{t(language, "Today's safety check", "आज की सुरक्षा जाँच")}</h2>
-        <p className="mt-1 text-base text-[#66716c]">{todayISO()}</p>
+      <PageHeader
+        badge="bg-[#fff4e6] text-[#e0862d]"
+        icon={<Icon name="helmet" />}
+        title={t(language, "Safety Support", "सुरक्षा सहायता")}
+        detail={t(language, "Check risks and save a note if something happens.", "जोखिम जाँचें और घटना हो तो नोट सेव करें।")}
+      />
+      <section className="rounded-[28px] border border-[#ffe8cc] bg-white p-4 shadow-[0_12px_30px_rgba(22,49,92,0.05)]">
+        <h2 className="text-xl font-semibold text-[#12284d]">{t(language, "Today's safety check", "आज की सुरक्षा जाँच")}</h2>
+        <p className="mt-1 text-base text-[#5d6e80]">{todayISO()}</p>
         <ul className="mt-3 grid gap-2">
           {items.map((item) => (
             <li key={item.id}>
@@ -59,18 +66,18 @@ export function SafetyView({
           type="button"
           disabled={guide.loading}
           onClick={ask}
-          className="mt-4 min-h-12 w-full rounded-xl bg-[#3d5c52] text-lg font-semibold text-white disabled:opacity-50"
+          className="mt-4 min-h-12 w-full rounded-full bg-[#e0862d] text-lg font-semibold text-white disabled:opacity-50"
         >
           {t(language, "Get safety guidance", "सुरक्षा सलाह लो")}
         </button>
       </section>
       <AiPanel language={language} loading={guide.loading} error={guide.error} result={guide.result} />
       {guide.result && (
-        <button type="button" onClick={() => onSaveIncident(guide.result?.summary ?? "")} className="min-h-12 rounded-xl border border-[#3d5c52] bg-white text-lg font-semibold">
+        <button type="button" onClick={() => onSaveIncident(guide.result?.summary ?? "")} className="min-h-12 rounded-full border border-[#e0862d] bg-white text-lg font-semibold text-[#12284d]">
           {t(language, "Save this incident note", "इस घटना का नोट सेव करें")}
         </button>
       )}
-      <p className="text-base text-[#66716c]">
+      <p className="text-base text-[#5d6e80]">
         {t(language, "Saving a note does not contact police or an ambulance.", "नोट सेव करने से पुलिस या एम्बुलेंस को सूचना नहीं जाती।")}
       </p>
     </div>

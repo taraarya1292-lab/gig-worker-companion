@@ -22,7 +22,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${sans.variable} ${devanagari.variable} h-full`}>
-      <body className="min-h-full">{children}</body>
+      <body>
+        <div className="app-frame">{children}</div>
+      </body>
     </html>
   );
 }

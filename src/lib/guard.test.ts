@@ -53,6 +53,12 @@ describe("privacy and request checks", () => {
     expect(() => parseGuideResult('{"title":"","summary":""}')).toThrow(/empty/i);
   });
 
+  it("reads a JSON answer that arrives with extra text around it", () => {
+    const result = parseGuideResult('Note:\n{"title":"Deduction","summary":"₹500 was recorded.","points":["Ask why"],"nextStep":"Open app help"}');
+    expect(result.summary).toContain("₹500");
+    expect(result.nextStep).toBe("Open app help");
+  });
+
   it("keeps only the fields the screen can show", () => {
     const result = parseGuideResult(JSON.stringify({
       title: "Deduction",

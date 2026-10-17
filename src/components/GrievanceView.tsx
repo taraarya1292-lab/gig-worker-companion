@@ -109,12 +109,12 @@ export function GrievanceView({
 
   return (
     <div className="grid gap-4">
-      <section className="rounded-3xl border border-[#e8e2d6] bg-white p-5 shadow-[0_12px_32px_rgba(47,97,84,0.06)]">
-        <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-[#3d7a64]">
+      <section className="rounded-[28px] border border-[#d9e6f8] bg-gradient-to-b from-white to-[#eef4ff] p-5 shadow-[0_12px_30px_rgba(22,49,92,0.05)]">
+        <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-[#2d6bff]">
           <Icon name="path" />
           {t(language, "Problem to resolution", "समस्या से समाधान")}
         </p>
-        <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#2f6154]">{t(language, "Fix a work problem", "काम की समस्या सुलझाएँ")}</h2>
+        <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#12284d]">{t(language, "Fix a work problem", "काम की समस्या सुलझाएँ")}</h2>
         <p className="mt-2 text-base leading-7">
           {t(language, "Describe it once. Sathi AI uses your records only if you allow it, then prepares a letter you can edit.", "एक बार लिखें। साथी AI आपके रिकॉर्ड तभी देखेगा जब आप अनुमति देंगे, फिर एक पत्र तैयार करेगा जिसे आप बदल सकते हैं।")}
         </p>

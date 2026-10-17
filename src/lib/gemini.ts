@@ -4,7 +4,7 @@ const MODELS = ["gemini-flash-latest", "gemini-2.0-flash"];
 
 let workingModel: string | null = null;
 
-type GeminiPart = { text?: string };
+type GeminiPart = { text?: string; thought?: boolean };
 type GeminiResponse = {
   candidates?: Array<{
     content?: { parts?: GeminiPart[] };
@@ -14,87 +14,109 @@ type GeminiResponse = {
   error?: { message?: string };
 };
 
+const RESPONSE_SCHEMA = {
+  type: "OBJECT",
+  properties: {
+    title: { type: "STRING" },
+    summary: { type: "STRING" },
+    points: { type: "ARRAY", items: { type: "STRING" } },
+    nextStep: { type: "STRING" },
+    facts: { type: "ARRAY", items: { type: "STRING" } },
+    assumptions: { type: "ARRAY", items: { type: "STRING" } },
+    plan: { type: "ARRAY", items: { type: "STRING" } },
+    letter: { type: "STRING" },
+    evidence: { type: "ARRAY", items: { type: "STRING" } },
+    channels: { type: "ARRAY", items: { type: "STRING" } },
+    missing: { type: "ARRAY", items: { type: "STRING" } },
+  },
+  required: ["title", "summary", "points", "nextStep"],
+};
+
 export async function askGemini(system: string, user: string): Promise<GuideResult> {
   const key = process.env.GEMINI_API_KEY;
   if (!key) {
     throw new Error("GEMINI_API_KEY is missing on the server.");
   }
 
-  const models = workingModel ? [workingModel] : MODELS;
-  let response: Response | null = null;
+  const models = workingModel ? [workingModel, ...MODELS.filter((model) => model !== workingModel)] : MODELS;
+  let sawModel = false;
+  let lastError = "Gemini did not respond. Try again.";
 
   for (const model of models) {
-    response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": key,
-        },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: system }] },
-          contents: [{ role: "user", parts: [{ text: user }] }],
-          generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 2048,
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: "OBJECT",
-              properties: {
-                title: { type: "STRING" },
-                summary: { type: "STRING" },
-                points: { type: "ARRAY", items: { type: "STRING" } },
-                nextStep: { type: "STRING" },
-                facts: { type: "ARRAY", items: { type: "STRING" } },
-                assumptions: { type: "ARRAY", items: { type: "STRING" } },
-                plan: { type: "ARRAY", items: { type: "STRING" } },
-                letter: { type: "STRING" },
-                evidence: { type: "ARRAY", items: { type: "STRING" } },
-                channels: { type: "ARRAY", items: { type: "STRING" } },
-                missing: { type: "ARRAY", items: { type: "STRING" } },
-              },
-              required: ["title", "summary", "points", "nextStep"],
-            },
-          },
-        }),
-        signal: AbortSignal.timeout(25000),
-      },
-    );
+    for (const limitThinking of [true, false]) {
+      const response = await requestGemini(model, key, system, user, limitThinking);
+      if (response.status === 404) break;
+      sawModel = true;
+      if (response.status === 400 && limitThinking) continue;
+      if (!response.ok) {
+        lastError = response.status === 429
+          ? "Gemini is busy. Wait a moment and try again."
+          : response.status === 400 || response.status === 401 || response.status === 403
+            ? "Gemini rejected the API key or the request."
+            : "Gemini did not respond. Try again.";
+        break;
+      }
 
-    if (response.status === 404) continue;
-    if (response.ok) workingModel = model;
-    break;
-  }
-
-  if (!response || response.status === 404) {
-    throw new Error("Gemini model was not found.");
-  }
-
-  if (!response.ok) {
-    if (response.status === 400 || response.status === 401 || response.status === 403) {
-      throw new Error("Gemini rejected the API key or the request.");
+      const data = (await response.json()) as GeminiResponse;
+      if (data.promptFeedback?.blockReason) {
+        lastError = "Gemini could not answer this message.";
+        break;
+      }
+      const text = answerText(data);
+      try {
+        const result = parseGuideResult(text);
+        workingModel = model;
+        return result;
+      } catch (error) {
+        workingModel = null;
+        lastError = error instanceof Error ? error.message : lastError;
+        break;
+      }
     }
-    if (response.status === 429) {
-      throw new Error("Gemini is busy. Wait a moment and try again.");
-    }
-    throw new Error("Gemini did not respond. Try again.");
   }
 
-  const data = (await response.json()) as GeminiResponse;
-  if (data.promptFeedback?.blockReason) {
-    throw new Error("Gemini could not answer this message.");
-  }
+  if (!sawModel) throw new Error("Gemini model was not found.");
+  throw new Error(lastError);
+}
 
-  const text = data.candidates?.[0]?.content?.parts?.map((part) => part.text ?? "").join("") ?? "";
-  return parseGuideResult(text);
+async function requestGemini(model: string, key: string, system: string, user: string, limitThinking: boolean) {
+  const generationConfig: Record<string, unknown> = {
+    temperature: 0.3,
+    maxOutputTokens: 8192,
+    responseMimeType: "application/json",
+    responseSchema: RESPONSE_SCHEMA,
+  };
+  if (limitThinking) generationConfig.thinkingConfig = { thinkingBudget: 0 };
+
+  return fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-goog-api-key": key,
+    },
+    body: JSON.stringify({
+      system_instruction: { parts: [{ text: system }] },
+      contents: [{ role: "user", parts: [{ text: user }] }],
+      generationConfig,
+    }),
+    signal: AbortSignal.timeout(25000),
+  });
+}
+
+function answerText(data: GeminiResponse): string {
+  const parts = data.candidates?.[0]?.content?.parts ?? [];
+  const visible = parts.filter((part) => !part.thought);
+  return (visible.length > 0 ? visible : parts).map((part) => part.text ?? "").join("").trim();
 }
 
 export function parseGuideResult(text: string): GuideResult {
   const cleaned = text.replace(/```json|```/g, "").trim();
+  const start = cleaned.indexOf("{");
+  const end = cleaned.lastIndexOf("}");
+  const json = start >= 0 && end > start ? cleaned.slice(start, end + 1) : cleaned;
   let parsed: unknown;
   try {
-    parsed = JSON.parse(cleaned);
+    parsed = JSON.parse(json);
   } catch {
     throw new Error("Gemini returned an unreadable answer. Try again.");
   }

@@ -1,131 +1,254 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Icon } from "@/components/Icon";
-import { hourlyFromTotals, totalsOf } from "@/lib/money";
-import { roleLabel, t } from "@/lib/text";
-import { isoDaysAgo, rupees, todayISO } from "@/lib/storage";
-import type { Earning, Profile, WorkCase } from "@/lib/types";
+import { Mascot } from "@/components/Mascot";
+import { SpeakButton } from "@/components/SpeakButton";
+import { t } from "@/lib/text";
+import type { Language, Profile } from "@/lib/types";
 
-export type ViewName = "home" | "earnings" | "safety" | "rights" | "documents" | "grievance";
+export type ViewName = "home" | "earnings" | "safety" | "rights" | "documents" | "grievance" | "more";
 
 export function HomeView({
   profile,
-  earnings,
-  cases,
-  safetyDate,
-  hasDocument,
+  serviceFocus,
   onOpen,
-  onDemo,
-  onChangeProfile,
-  onClear,
+  onAsk,
+  onLanguage,
 }: {
   profile: Profile;
-  earnings: Earning[];
-  cases: WorkCase[];
-  safetyDate: string | null;
-  hasDocument: boolean;
+  serviceFocus: number;
   onOpen: (view: ViewName) => void;
-  onDemo: () => void;
-  onChangeProfile: () => void;
-  onClear: () => void;
+  onAsk: (problem: string) => void;
+  onLanguage: (language: Language) => void;
 }) {
-  const today = todayISO();
-  const week = earnings.filter((entry) => entry.date >= isoDaysAgo(6));
-  const todayEntries = earnings.filter((entry) => entry.date === today);
-  const todayTotals = totalsOf(todayEntries);
-  const weekTotals = totalsOf(week);
-  const hourly = hourlyFromTotals(weekTotals.hours, weekTotals.net);
   const language = profile.language;
-  const openCases = cases.filter((item) => item.status !== "done").length;
+  const [problem, setProblem] = useState("");
 
-  const links: Array<{ view: ViewName; title: string; detail: string; icon: "wallet" | "shield" | "scale" | "file" }> = [
+  useEffect(() => {
+    if (serviceFocus === 0) return;
+    document.getElementById("services")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [serviceFocus]);
+
+  function ask(text: string) {
+    const next = text.trim();
+    if (next.length < 3) return;
+    onAsk(next);
+  }
+
+  const chips = [
     {
-      view: "earnings",
-      icon: "wallet",
-      title: t(language, "Earnings", "कमाई"),
-      detail: t(language, "Gross, expenses, deductions, and hourly pay", "सकल, खर्च, कटौती और घंटे की कमाई"),
+      icon: "chart" as const,
+      label: t(language, "Why is my payment low?", "मेरी कमाई कम क्यों है?"),
+      text: t(
+        language,
+        "My payment looks lower than I expected. Please explain the change from my saved earnings.",
+        "मेरी कमाई उम्मीद से कम लग रही है। सेव की हुई कमाई से बदलाव समझाइए।",
+      ),
+      tone: "bg-[#eef6ff] text-[#2458b5]",
     },
     {
-      view: "safety",
-      icon: "shield",
-      title: t(language, "Safety", "सुरक्षा"),
-      detail: t(language, "Check risks and save an incident note", "जोखिम जाँचें और घटना का नोट सेव करें"),
+      icon: "file" as const,
+      label: t(language, "Write a complaint", "शिकायत लिखें"),
+      text: t(
+        language,
+        "I want to write a complaint about a problem at work.",
+        "मैं काम की समस्या की शिकायत लिखना चाहता हूँ।",
+      ),
+      tone: "bg-[#eefaf2] text-[#1d8a49]",
+    },
+  ];
+
+  const services: Array<{
+    view: ViewName;
+    title: string;
+    detail: string;
+    icon: "chart" | "file" | "shield" | "helmet";
+    card: string;
+    badge: string;
+  }> = [
+    {
+      view: "earnings",
+      icon: "chart",
+      title: t(language, "Earnings Guide", "कमाई गाइड"),
+      detail: t(language, "Understand payments, deductions and hourly pay.", "कमाई, कटौती और घंटे की कमाई समझें।"),
+      card: "bg-[#e7f7ee]",
+      badge: "bg-white text-[#1f9a57]",
+    },
+    {
+      view: "grievance",
+      icon: "file",
+      title: t(language, "Report a Problem", "समस्या बताएँ"),
+      detail: t(language, "Get help with payments, deductions and work issues.", "कमाई, कटौती और काम की समस्या में मदद।"),
+      card: "bg-[#e8f1ff]",
+      badge: "bg-white text-[#2d6bff]",
     },
     {
       view: "rights",
-      icon: "scale",
-      title: t(language, "Rights and schemes", "अधिकार और योजनाएँ"),
-      detail: t(language, "Official notes and what to confirm", "आधिकारिक नोट और क्या पुष्टि करें"),
+      icon: "shield",
+      title: t(language, "Benefits & Rights", "लाभ और अधिकार"),
+      detail: t(language, "See official scheme notes and what to confirm.", "आधिकारिक योजना नोट देखें और क्या पुष्टि करें।"),
+      card: "bg-[#f3eeff]",
+      badge: "bg-white text-[#7a4de0]",
     },
     {
-      view: "documents",
-      icon: "file",
-      title: t(language, "Document help", "दस्तावेज़ मदद"),
-      detail: t(language, "Explain a notice, then use it in a case", "नोटिस समझें, फिर केस में लगाएँ"),
+      view: "safety",
+      icon: "helmet",
+      title: t(language, "Safety Support", "सुरक्षा सहायता"),
+      detail: t(language, "Check risks and save a note if something happens.", "जोखिम जाँचें और घटना हो तो नोट सेव करें।"),
+      card: "bg-[#fff4e6]",
+      badge: "bg-white text-[#e0862d]",
     },
   ];
 
   return (
-    <div className="grid gap-4">
-      <section className="rounded-3xl border border-[#e8e2d6] bg-white p-5 shadow-[0_12px_32px_rgba(47,97,84,0.06)]">
-        <p className="text-base text-[#66716c]">{roleLabel(profile.role, language)} · {profile.state}</p>
-        <p className="mt-3 text-sm font-semibold uppercase tracking-wide text-[#3d7a64]">{t(language, "Today's net", "आज की शुद्ध कमाई")}</p>
-        <p className="text-4xl font-semibold tracking-tight text-[#2f6154]">{rupees(todayTotals.net)}</p>
-        <p className="mt-2 text-base">
-          {t(language, "Gross", "सकल")} {rupees(todayTotals.gross)} · {t(language, "Deductions", "कटौती")} {rupees(todayTotals.deduction)}
+    <div className="grid gap-5">
+      <header className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <img src="/sathi-mark.png" alt="" width={48} height={54} className="h-12 w-11" />
+          <div>
+            <p className="text-xl font-semibold leading-none text-[#16315c]">
+              Sathi <span className="text-[#2f9e57]">AI</span>
+            </p>
+            <p className="mt-1 text-[11px] leading-tight text-[#607086]">Your Work. Your Rights. Your Support.</p>
+          </div>
+        </div>
+        <label className="inline-flex h-10 items-center gap-1 rounded-full border border-[#d7efe4] bg-white px-3 text-sm font-semibold text-[#1d6b4f]">
+          <Globe />
+          <span className="sr-only">{t(language, "Language", "भाषा")}</span>
+          <select
+            aria-label={t(language, "Language", "भाषा")}
+            value={language}
+            onChange={(event) => onLanguage(event.target.value as Language)}
+            className="bg-transparent pr-1 text-sm font-semibold"
+          >
+            <option value="en">English</option>
+            <option value="hi">हिंदी</option>
+          </select>
+        </label>
+      </header>
+
+      <section className="relative overflow-hidden pr-24">
+        <h1 className="max-w-[16.5rem] text-[2rem] font-semibold leading-[1.15] text-[#12284d]">
+          {language === "hi" ? (
+            <>
+              आज हम आपकी कैसे{" "}
+              <span className="relative inline-block text-[#2d6bff]">
+                मदद
+                <span className="absolute -bottom-1 left-0 h-1 w-full rounded-full bg-[#f0a04b]" />
+              </span>
+              {" करें?"}
+            </>
+          ) : (
+            <>
+              How can we help you{" "}
+              <span className="relative inline-block text-[#2d6bff]">
+                today
+                <span className="absolute -bottom-1 left-0 h-1 w-full rounded-full bg-[#f0a04b]" />
+              </span>?
+            </>
+          )}
+        </h1>
+        <p className="mt-3 max-w-[16rem] text-base leading-6 text-[#5d6e80]">
+          {t(language, "Get guidance, understand your rights, and find the right support.", "मदद लें, अपने अधिकार समझें, और सही सहायता खोजें।")}
         </p>
-        <p className="mt-1 text-base text-[#66716c]">
-          {t(language, "Last 7 days net", "पिछले 7 दिन की शुद्ध कमाई")}: {rupees(weekTotals.net)}
-          {hourly == null ? "" : ` · ${rupees(hourly)}/${t(language, "hr", "घंटा")}`}
-        </p>
-        <p className="mt-2 text-base text-[#66716c]">
-          {openCases} {t(language, "open cases", "खुले केस")} · {safetyDate === today
-            ? t(language, "safety check done", "सुरक्षा जाँच हो चुकी")
-            : t(language, "safety check not done", "सुरक्षा जाँच बाकी")}
-        </p>
+        <div className="pointer-events-none absolute -right-2 top-0">
+          <Mascot />
+        </div>
       </section>
 
-      <button type="button" onClick={() => onOpen("grievance")} className="min-h-20 rounded-3xl bg-[#3d7a64] px-5 py-4 text-left text-white shadow-[0_12px_28px_rgba(61,122,100,0.22)]">
-        <span className="flex items-center gap-2 text-xl font-semibold">
-          <Icon name="path" className="h-6 w-6" />
-          {t(language, "Resolve a problem", "समस्या सुलझाएँ")}
-        </span>
-        <span className="mt-1 block text-base">
-          {hasDocument
-            ? t(language, "Uses your pay records and the last notice, if you allow it.", "आपकी अनुमति पर कमाई और आखिरी नोटिस का उपयोग।")
-            : t(language, "From what happened to a letter and a follow-up.", "जो हुआ उससे पत्र और फॉलो अप तक।")}
-        </span>
-      </button>
-
-      <nav className="grid gap-2" aria-label={t(language, "Features", "सुविधाएँ")}>
-        {links.map((link) => (
-          <button key={link.view} type="button" onClick={() => onOpen(link.view)} className="flex min-h-16 items-center gap-3 rounded-2xl border border-[#e8e2d6] bg-white px-4 py-3 text-left shadow-[0_8px_24px_rgba(47,97,84,0.04)]">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#e8f4ee] text-[#3d7a64]">
-              <Icon name={link.icon} />
-            </span>
-            <span>
-              <span className="block text-lg font-semibold">{link.title}</span>
-              <span className="block text-base text-[#66716c]">{link.detail}</span>
-            </span>
+      <section className="rounded-[28px] border border-[#e3f3ea] bg-gradient-to-b from-white to-[#eef8f3] p-4 shadow-[0_12px_30px_rgba(40,110,80,0.06)]">
+        <h2 className="text-2xl font-semibold text-[#16315c]">{t(language, "Ask Sathi AI", "साथी AI से पूछें")}</h2>
+        <p className="text-base text-[#6a7c8c]">{t(language, "Your personal work-support assistant", "आपका काम-सहायता सहायक")}</p>
+        <form
+          className="mt-3 flex items-center gap-1 rounded-full border border-[#d9e4ec] bg-white px-3"
+          onSubmit={(event) => {
+            event.preventDefault();
+            ask(problem);
+          }}
+        >
+          <label className="sr-only" htmlFor="ask-problem">{t(language, "Describe your problem", "अपनी समस्या लिखें")}</label>
+          <input
+            id="ask-problem"
+            value={problem}
+            onChange={(event) => setProblem(event.target.value)}
+            placeholder={t(language, "Describe your problem...", "अपनी समस्या लिखें...")}
+            className="min-h-12 min-w-0 flex-1 bg-transparent text-base outline-none"
+          />
+          <SpeakButton compact language={language} onText={(spoken) => setProblem((current) => `${current} ${spoken}`.trim())} />
+          <button type="submit" aria-label={t(language, "Send to Sathi AI", "साथी AI को भेजें")} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#21a35a] text-white">
+            <ArrowUp />
           </button>
-        ))}
-      </nav>
+        </form>
+        <div className="pill-row mt-3">
+          {chips.map((chip) => (
+            <button key={chip.label} type="button" onClick={() => ask(chip.text)} className={`inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold ${chip.tone}`}>
+              <Icon name={chip.icon} className="h-4 w-4" />
+              {chip.label}
+            </button>
+          ))}
+          <button type="button" onClick={() => onOpen("rights")} className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#f4efff] px-3 py-2 text-sm font-semibold text-[#7a4de0]">
+            <Icon name="shield" className="h-4 w-4" />
+            {t(language, "Check my benefits", "मेरे लाभ देखें")}
+          </button>
+        </div>
+      </section>
 
-      <button type="button" onClick={onDemo} className="min-h-12 rounded-xl border border-[#3d5c52] bg-white text-lg font-semibold">
-        {t(language, "Load the sample ₹500 deduction story", "₹500 कटौती की नमूना कहानी खोलें")}
+      <section id="services" className="scroll-mt-4">
+        <h2 className="text-2xl font-semibold text-[#12284d]">{t(language, "Explore Services", "सेवाएँ देखें")}</h2>
+        <p className="text-base text-[#66788a]">{t(language, "Choose a topic or ask Sathi AI directly.", "कोई विषय चुनें या सीधे साथी AI से पूछें।")}</p>
+        <div className="mt-3 grid grid-cols-2 gap-3">
+          {services.map((service) => (
+            <button key={service.view} type="button" onClick={() => onOpen(service.view)} className={`min-h-36 rounded-3xl p-4 text-left ${service.card}`}>
+              <span className="flex items-start justify-between gap-2">
+                <span className={`flex h-10 w-10 items-center justify-center rounded-2xl ${service.badge}`}>
+                  <Icon name={service.icon} />
+                </span>
+                <Chevron />
+              </span>
+              <span className="mt-3 block text-base font-semibold leading-5 text-[#16315c]">{service.title}</span>
+              <span className="mt-1 block text-sm leading-5 text-[#5d6e80]">{service.detail}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <button type="button" onClick={() => document.getElementById("ask-problem")?.focus()} className="flex items-center gap-3 rounded-3xl bg-[#eef6ff] px-4 py-4 text-left">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-[#2d6bff]">
+          <Icon name="path" />
+        </span>
+        <span>
+          <span className="block font-semibold text-[#16315c]">{t(language, "Not sure where to start?", "कहाँ से शुरू करें?")}</span>
+          <span className="block text-sm text-[#5d6e80]">{t(language, "Tell Sathi AI what happened. It will guide you step by step.", "साथी AI को बताएँ क्या हुआ। यह कदम दर कदम आगे बढ़ाएगा।")}</span>
+        </span>
+        <Chevron />
       </button>
-      <p className="text-sm text-[#66716c]">
-        {t(language, "The sample replaces pay entries on this phone. It is not your real income.", "नमूना इस फोन की कमाई एंट्री बदल देता है। यह आपकी असली आय नहीं है।")}
-      </p>
-
-      <div className="grid gap-2">
-        <button type="button" onClick={onChangeProfile} className="min-h-12 rounded-xl border border-[#3d5c52] bg-white text-lg font-semibold">
-          {t(language, "Change role or language", "काम या भाषा बदलें")}
-        </button>
-        <button type="button" onClick={onClear} className="min-h-12 rounded-xl text-lg text-[#9a4a4a]">
-          {t(language, "Clear data on this phone", "इस फोन का डेटा मिटाएँ")}
-        </button>
-      </div>
     </div>
+  );
+}
+
+function Globe() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+      <circle cx="12" cy="12" r="8" />
+      <path d="M4 12h16M12 4c2.5 2.5 2.5 13 0 16M12 4c-2.5 2.5-2.5 13 0 16" />
+    </svg>
+  );
+}
+
+function ArrowUp() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+      <path d="M12 18V6" />
+      <path d="m7 11 5-5 5 5" />
+    </svg>
+  );
+}
+
+function Chevron() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 text-[#8aa0b3]" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <path d="m9 6 6 6-6 6" />
+    </svg>
   );
 }

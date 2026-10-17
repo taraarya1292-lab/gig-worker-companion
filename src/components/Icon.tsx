@@ -2,7 +2,7 @@ export function Icon({
   name,
   className = "h-5 w-5",
 }: {
-  name: "leaf" | "wallet" | "shield" | "scale" | "file" | "path" | "mic" | "home";
+  name: "leaf" | "wallet" | "shield" | "scale" | "file" | "path" | "mic" | "home" | "chart" | "helmet";
   className?: string;
 }) {
   const props = {
@@ -65,6 +65,25 @@ export function Icon({
         <circle cx="6" cy="6" r="2" />
         <circle cx="18" cy="18" r="2" />
         <path d="M8 7c6 1 8 8 8 9" />
+      </svg>
+    );
+  }
+  if (name === "chart") {
+    return (
+      <svg {...props}>
+        <path d="M4 19h16" />
+        <path d="M7 16v-4" />
+        <path d="M12 16V8" />
+        <path d="M17 16V5" />
+      </svg>
+    );
+  }
+  if (name === "helmet") {
+    return (
+      <svg {...props}>
+        <path d="M4 14a8 8 0 0 1 16 0" />
+        <path d="M4 14h16v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2Z" />
+        <path d="M12 6v3" />
       </svg>
     );
   }

@@ -19,9 +19,11 @@ type SpeechRec = {
 export function SpeakButton({
   language,
   onText,
+  compact = false,
 }: {
   language: Language;
   onText: (text: string) => void;
+  compact?: boolean;
 }) {
   const supported = useSyncExternalStore(
     () => () => undefined,
@@ -52,6 +54,14 @@ export function SpeakButton({
     };
     recognition.onerror = () => undefined;
     recognition.start();
+  }
+
+  if (compact) {
+    return (
+      <button type="button" onClick={listen} aria-label={t(language, "Speak", "बोलें")} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[#5d6d7e]">
+        <Icon name="mic" />
+      </button>
+    );
   }
 
   return (

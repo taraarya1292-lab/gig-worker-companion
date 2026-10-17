@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { AiPanel } from "@/components/AiPanel";
 import { Icon } from "@/components/Icon";
+import { PageHeader } from "@/components/PageHeader";
 import { hourlyFromTotals, hourlyOf, netOf, totalsOf } from "@/lib/money";
 import { useGuide } from "@/lib/useGuide";
 import { isoDaysAgo, rupees, todayISO } from "@/lib/storage";
@@ -76,51 +77,57 @@ export function EarningsView({
 
   return (
     <div className="grid gap-4">
-      <form onSubmit={save} className="grid gap-3 rounded-2xl border border-[#e8e2d6] bg-white p-4">
-        <h2 className="flex items-center gap-2 text-2xl font-semibold"><Icon name="wallet" />{t(language, "Add earning", "कमाई जोड़ें")}</h2>
+      <PageHeader
+        badge="bg-[#e7f7ee] text-[#1f9a57]"
+        icon={<Icon name="chart" />}
+        title={t(language, "Earnings Guide", "कमाई गाइड")}
+        detail={t(language, "Understand payments, deductions and hourly pay.", "कमाई, कटौती और घंटे की कमाई समझें।")}
+      />
+      <form onSubmit={save} className="grid gap-3 rounded-[28px] border border-[#e3f3ea] bg-white p-4 shadow-[0_12px_30px_rgba(22,49,92,0.05)]">
+        <h2 className="text-xl font-semibold text-[#12284d]">{t(language, "Add earning", "कमाई जोड़ें")}</h2>
         <label className="text-base font-semibold" htmlFor="earn-date">
           {t(language, "Date", "तारीख")}
-          <input id="earn-date" type="date" value={date} onChange={(event) => setDate(event.target.value)} required className="mt-1 min-h-12 w-full rounded-xl border border-[#ddd6c8] px-3 text-lg" />
+          <input id="earn-date" type="date" value={date} onChange={(event) => setDate(event.target.value)} required className="mt-1 min-h-12 w-full rounded-xl border border-[#d9e4ec] bg-white px-3 text-lg" />
         </label>
         <label className="text-base font-semibold" htmlFor="earn-amount">
           {t(language, "Gross pay", "सकल कमाई")}
-          <input id="earn-amount" inputMode="decimal" value={amount} onChange={(event) => setAmount(event.target.value)} required className="mt-1 min-h-12 w-full rounded-xl border border-[#ddd6c8] px-3 text-lg" />
+          <input id="earn-amount" inputMode="decimal" value={amount} onChange={(event) => setAmount(event.target.value)} required className="mt-1 min-h-12 w-full rounded-xl border border-[#d9e4ec] bg-white px-3 text-lg" />
         </label>
         <div className="grid grid-cols-2 gap-2">
           <label className="text-base font-semibold" htmlFor="earn-expense">
             {t(language, "Expenses", "खर्च")}
-            <input id="earn-expense" inputMode="decimal" value={expense} onChange={(event) => setExpense(event.target.value)} className="mt-1 min-h-12 w-full rounded-xl border border-[#ddd6c8] px-3 text-lg" />
+            <input id="earn-expense" inputMode="decimal" value={expense} onChange={(event) => setExpense(event.target.value)} className="mt-1 min-h-12 w-full rounded-xl border border-[#d9e4ec] bg-white px-3 text-lg" />
           </label>
           <label className="text-base font-semibold" htmlFor="earn-deduction">
             {t(language, "Deductions", "कटौती")}
-            <input id="earn-deduction" inputMode="decimal" value={deduction} onChange={(event) => setDeduction(event.target.value)} className="mt-1 min-h-12 w-full rounded-xl border border-[#ddd6c8] px-3 text-lg" />
+            <input id="earn-deduction" inputMode="decimal" value={deduction} onChange={(event) => setDeduction(event.target.value)} className="mt-1 min-h-12 w-full rounded-xl border border-[#d9e4ec] bg-white px-3 text-lg" />
           </label>
         </div>
         <label className="text-base font-semibold" htmlFor="earn-hours">
           {t(language, "Hours worked", "काम के घंटे")}
-          <input id="earn-hours" inputMode="decimal" value={hours} onChange={(event) => setHours(event.target.value)} className="mt-1 min-h-12 w-full rounded-xl border border-[#ddd6c8] px-3 text-lg" />
+          <input id="earn-hours" inputMode="decimal" value={hours} onChange={(event) => setHours(event.target.value)} className="mt-1 min-h-12 w-full rounded-xl border border-[#d9e4ec] bg-white px-3 text-lg" />
         </label>
         <label className="text-base font-semibold" htmlFor="earn-note">
           {t(language, "Note", "नोट")}
-          <input id="earn-note" value={note} maxLength={200} onChange={(event) => setNote(event.target.value)} className="mt-1 min-h-12 w-full rounded-xl border border-[#ddd6c8] px-3 text-lg" />
+          <input id="earn-note" value={note} maxLength={200} onChange={(event) => setNote(event.target.value)} className="mt-1 min-h-12 w-full rounded-xl border border-[#d9e4ec] bg-white px-3 text-lg" />
         </label>
         {formError && <p role="alert" className="text-[#9a4a4a]">{formError}</p>}
-        <button type="submit" className="min-h-12 rounded-xl bg-[#3d7a64] text-lg font-semibold text-white">
+        <button type="submit" className="min-h-12 rounded-full bg-[#21a35a] text-lg font-semibold text-white">
           {t(language, "Save on this phone", "इस फोन पर सेव करें")}
         </button>
       </form>
 
-      <section className="rounded-2xl border border-[#e8e2d6] bg-white p-4">
-        <h2 className="text-2xl font-semibold">{t(language, "Last 7 days", "पिछले 7 दिन")}</h2>
+      <section className="rounded-[28px] border border-[#e3f3ea] bg-white p-4 shadow-[0_12px_30px_rgba(22,49,92,0.05)]">
+        <h2 className="text-2xl font-semibold text-[#12284d]">{t(language, "Last 7 days", "पिछले 7 दिन")}</h2>
         {week.length === 0 ? (
           <p className="mt-2 text-lg">{t(language, "No earnings yet.", "अभी कोई कमाई नहीं।")}</p>
         ) : (
           <>
             <dl className="mt-3 grid grid-cols-2 gap-2 text-base">
-              <div><dt className="text-[#66716c]">{t(language, "Gross", "सकल")}</dt><dd className="text-lg font-semibold">{rupees(totals.gross)}</dd></div>
-              <div><dt className="text-[#66716c]">{t(language, "Net", "शुद्ध")}</dt><dd className="text-lg font-semibold">{rupees(totals.net)}</dd></div>
-              <div><dt className="text-[#66716c]">{t(language, "Expenses", "खर्च")}</dt><dd className="text-lg font-semibold">{rupees(totals.expense)}</dd></div>
-              <div><dt className="text-[#66716c]">{t(language, "Deductions", "कटौती")}</dt><dd className="text-lg font-semibold">{rupees(totals.deduction)}</dd></div>
+              <div><dt className="text-[#5d6e80]">{t(language, "Gross", "सकल")}</dt><dd className="text-lg font-semibold">{rupees(totals.gross)}</dd></div>
+              <div><dt className="text-[#5d6e80]">{t(language, "Net", "शुद्ध")}</dt><dd className="text-lg font-semibold">{rupees(totals.net)}</dd></div>
+              <div><dt className="text-[#5d6e80]">{t(language, "Expenses", "खर्च")}</dt><dd className="text-lg font-semibold">{rupees(totals.expense)}</dd></div>
+              <div><dt className="text-[#5d6e80]">{t(language, "Deductions", "कटौती")}</dt><dd className="text-lg font-semibold">{rupees(totals.deduction)}</dd></div>
             </dl>
             <p className="mt-2 text-base">
               {weekHourly == null
@@ -137,10 +144,10 @@ export function EarningsView({
                       <span>{entry.date}{entry.note ? ` · ${entry.note}` : ""}</span>
                       <span className="font-semibold">{rupees(net)}</span>
                     </div>
-                    <div className="mt-1 h-3 overflow-hidden rounded-full bg-[#f3efe6]" aria-hidden="true">
-                      <div className="h-full rounded-full bg-[#3d7a64]" style={{ width: `${Math.max(8, (Math.max(net, 0) / peak) * 100)}%` }} />
+                    <div className="mt-1 h-3 overflow-hidden rounded-full bg-[#e7f7ee]" aria-hidden="true">
+                      <div className="h-full rounded-full bg-[#21a35a]" style={{ width: `${Math.max(8, (Math.max(net, 0) / peak) * 100)}%` }} />
                     </div>
-                    <p className="mt-1 text-sm text-[#66716c]">
+                    <p className="mt-1 text-sm text-[#5d6e80]">
                       {t(language, "Gross", "सकल")} {rupees(entry.amount)} · {t(language, "Expenses", "खर्च")} {rupees(entry.expense)} · {t(language, "Deductions", "कटौती")} {rupees(entry.deduction)}
                       {hourly == null ? "" : ` · ${rupees(hourly)}/${t(language, "hr", "घंटा")}`}
                     </p>
@@ -154,7 +161,7 @@ export function EarningsView({
           type="button"
           disabled={week.length === 0 || guide.loading}
           onClick={() => guide.ask({ task: "earnings", profile, earnings: week })}
-          className="mt-4 min-h-12 w-full rounded-xl bg-[#3d5c52] text-lg font-semibold text-white disabled:opacity-50"
+          className="mt-4 min-h-12 w-full rounded-full bg-[#16315c] text-lg font-semibold text-white disabled:opacity-50"
         >
           {t(language, "Explain changes with Gemini", "Gemini से बदलाव समझाओ")}
         </button>
